@@ -33,8 +33,31 @@
 #include <memory>
 #include "patternMatcher.h"
 #include <regex>
+#include "func.h"
 
 
 
 
 using namespace std;
+
+enum matches {
+  MATCH_EXTENSION = 1,
+  MATCH_HEADER,
+  MATCH_FOOTER,
+  MATCH_MAX_SIZE
+};
+
+vector<FileHeader> patterns;
+
+// regex to parse the file signature file
+regex regex_pattern{
+  "([[:w:]]+)[[:s:]]+\\[[[:s:]]((?:[[:xdigit:]]{2}"
+  "[[:s:]])+)\\][[:s:]]*(?:\\[[[:s:]]((?:[[:xdigit:]]{2}[[:s:]])+)"
+  "\\][[:s:]]*)?([[:digit:]]+)[[:s:]]*"
+};
+
+
+
+void check_for_matches(smatch&);
+void get_file_signatures_from_file();
+void test_input_for_matches(const char*);

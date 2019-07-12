@@ -128,11 +128,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="fileHeader.cpp" />
+    <ClCompile Include="func.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="patternMatcher.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fileHeader.h" />
+    <ClInclude Include="func.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="patternMatcher.h" />
   </ItemGroup>

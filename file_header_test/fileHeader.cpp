@@ -23,6 +23,7 @@ void FileHeader::import_header_byte_array(string tmp_vec){
     header_byte_array.push_back(convert_hex(pair));  
 }
 
+
 void FileHeader::import_footer_byte_array(string tmp_vec){
   
   istringstream iss{ tmp_vec };
@@ -31,19 +32,30 @@ void FileHeader::import_footer_byte_array(string tmp_vec){
     footer_byte_array.push_back(convert_hex(pair));
   }
 }
+
+
 uint8_t FileHeader::convert_hex(string& pair) {
   return ((hex_map[pair[0]] * 16) + hex_map[pair[1]]);
 }
+
 
 void FileHeader::print_header_info()
 {
   cout << endl;
   cout << setw(17) << left << "EXTENSION" << ": "<< file_extension << endl;
   cout << setw(17) << left << "HEADER SIGNATURE" << ": ";
-  for (auto byte : header_byte_array) cout << "\\x" << hex << setw(2) << setfill('0') << (int)byte;
-  if (!footer_byte_array.empty()) {
-    cout << setw(17) << setfill(' ') << left << endl << "FOOTER SIGNATURE" << ": ";
-    for (auto byte : footer_byte_array) cout << "\\x" << hex << setw(2) << setfill('0') << (int)byte;
+  
+  for (auto byte : header_byte_array) {
+    cout << "\\x" << hex << setw(2) << setfill('0') << (int)byte;
   }
-  cout << setw(17) << setfill(' ') << dec << left << endl << "MAX CARVE SIZE" << ": " << max_carve_size << endl;
+  if (!footer_byte_array.empty()) {
+    cout << setw(17) << setfill(' ') << left << 
+      endl << "FOOTER SIGNATURE" << ": ";
+    
+    for (auto byte : footer_byte_array) {
+      cout << "\\x" << hex << setw(2) << setfill('0') << (int)byte;
+    }
+  }
+  cout << setw(17) << setfill(' ') << dec << left << 
+    endl << "MAX CARVE SIZE" << ": " << max_carve_size << endl;
 }
