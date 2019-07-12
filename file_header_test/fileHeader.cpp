@@ -39,23 +39,26 @@ uint8_t FileHeader::convert_hex(string& pair) {
 }
 
 
-void FileHeader::print_header_info()
+
+
+
+void FileHeader::print_info()
 {
   cout << endl;
-  cout << setw(17) << left << "EXTENSION" << ": "<< file_extension << endl;
+  cout << setw(17) << left << "EXTENSION" << ": " << file_extension << endl;
   cout << setw(17) << left << "HEADER SIGNATURE" << ": ";
-  
+
   for (auto byte : header_byte_array) {
     cout << "\\x" << hex << setw(2) << setfill('0') << (int)byte;
   }
   if (!footer_byte_array.empty()) {
-    cout << setw(17) << setfill(' ') << left << 
+    cout << setw(17) << setfill(' ') << left <<
       endl << "FOOTER SIGNATURE" << ": ";
-    
+
     for (auto byte : footer_byte_array) {
       cout << "\\x" << hex << setw(2) << setfill('0') << (int)byte;
     }
   }
-  cout << setw(17) << setfill(' ') << dec << left << 
+  cout << setw(17) << setfill(' ') << dec << left <<
     endl << "MAX CARVE SIZE" << ": " << max_carve_size << endl;
 }

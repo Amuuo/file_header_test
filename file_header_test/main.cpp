@@ -1,7 +1,14 @@
 #include "main.h"
 
+
+
 int main()
 {
-  get_file_signatures_from_file();
-  test_input_for_matches("testinput.txt");
+  PatternMatcher matcher;
+
+  // import signatures from file named "file_headers.txt"
+  matcher.import_file_signatures_and_setup_patterns();
+  matcher.test_input_for_matches("testinput.txt");
 }
+
+

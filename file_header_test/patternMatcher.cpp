@@ -2,64 +2,6 @@
 #include "patternMatcher.h"
 
 
-  /*
-
-int main()
-{
-  printf("\nPattern Matcher");
-
-  int n = 4;
-  PatternMatcher PM{};
-  vector<string> queries(n);
-
-  queries[0] = "adab";
-  queries[1] = "dab";
-  queries[2] = "ab";
-  queries[3] = "b";
-
-  string s = "abracadabra";
-
-  PM.create_goto(queries);
-  PM.find_matches(s);
-
-  printf("\nPM.positions.size(): %d", PM.positions.size());
-  printf("\nprinting positions:\n\n");
-
-  printf("\n\nString to search: %s\n\n", s.c_str());
-
-  for (int i = 0; i < PM.positions.size(); i++)
-  {
-    printf("%-5s: ", queries[i].c_str());
-    for (list<int>::iterator itr = PM.positions[i].begin(); itr != PM.positions[i].end(); ++itr)
-      printf("%d ", *itr - (queries[i].size() - 1));
-
-    printf("\n");
-  }
-
-
-  printf("\ngo_to:");
-
-  for (auto go : PM.go_to) {
-    for (auto state : go.second) {
-      printf("\n%c", state.first);
-    }
-  }
-
-  printf("\noutput: ");
-
-  for (auto output : PM.output) {
-    for (auto state : output.second) {
-      printf("\n%d", state);
-    }
-  }
-  return 0;
-}
-  */
-
-
-
-
-
 
 void PatternMatcher::find_matches(uint8_t* tmp, disk_pos blocksize)
 {
@@ -67,11 +9,9 @@ void PatternMatcher::find_matches(uint8_t* tmp, disk_pos blocksize)
   int state = 0;
   for (int i = 0; i < blocksize; i++) {
     while (go_to[state].count(tmp[i]) == 0) {
-      //printf("\ngo_to[state].count(S[i]): %i", (int)go_to[state].count(tmp[i]));
       state = failure[state];
     }
     state = go_to[state][tmp[i]];
-    //printf("\nstate: %d", state);
 
     if (output.count(state) > 0)
     {
@@ -80,27 +20,92 @@ void PatternMatcher::find_matches(uint8_t* tmp, disk_pos blocksize)
 
       for (int j = 0; j < t; j++)
       {
-        //printf("\npushing back %d", i);
         positions[tmp[j]].push_back(i);
       }
     }
-
   }
-
 }
 
+void PatternMatcher::check_for_matches() {
 
+  // check for matches in each regex match group
+  if (regex_matches[EXTENSION].matched) {
+    patterns.push_back(regex_matches[EXTENSION].str());
+    if (regex_matches[HEADER].matched) {
+      patterns.back().import_header_array(regex_matches[HEADER].str());
+      if (regex_matches[FOOTER].matched)
+        patterns.back().import_footer_array(regex_matches[FOOTER].str());
+      if (regex_matches[MAX_SIZE].matched)
+        patterns.back().max_carve_size = stol(regex_matches[MAX_SIZE].str());
+      else {
+        cerr << "Error with max size formatting. Exiting..." << endl;
+        exit(1);
+      }
+    }
+    else {
+      cerr << "Error with header signature formatting. Exiting..." << endl;
+      exit(1);
+    }
+  }
+}
 
-
-
-
-PatternMatcher::PatternMatcher(const vector<FileHeader>& patterns)
+void PatternMatcher::import_file_signatures_and_setup_patterns()
 {
-  create_goto(patterns);
-  this->patterns = patterns;
+  //==================================================
+  // regex to parse the file signature file
+  regex regex_pattern{
+    "([[:w:]]+)[[:s:]]+\\[[[:s:]]((?:[[:xdigit:]]{2}"
+    "[[:s:]])+)\\][[:s:]]*(?:\\[[[:s:]]((?:[[:xdigit:]]{2}"
+    "[[:s:]])+)\\][[:s:]]*)?([[:digit:]]+)[[:s:]]*"
+  };
+  ifstream    header_file{ "file_headers.txt" };
+  string      current_line;  
+  //==================================================
+
+  while (header_file.good()) {
+    getline(header_file, current_line);
+    regex_search(current_line, regex_matches, regex_pattern);
+    check_for_matches();
+  }
+  create_goto();
+  create_failure();
 }
 
-void PatternMatcher::create_goto(const vector<FileHeader>& patterns)
+
+
+
+void PatternMatcher::test_input_for_matches(const char* input_file)
+{
+  //==================================================
+  ifstream  testFile   { input_file, ios::ate };
+  uint8_t*  test_array { nullptr };
+  //==================================================
+
+  auto file_size = testFile.tellg();
+
+  // allocate array of filesize  
+  test_array = new uint8_t[file_size];
+  testFile.seekg(0, testFile.beg);
+
+  // copy file into array
+  testFile.read((char*)test_array, file_size);
+
+  find_matches(test_array, file_size);
+
+  for (int i = 0; i < positions.size(); i++) {
+    printf("\n%s: ", patterns[i].file_extension.c_str());
+
+    for (auto itr = positions[i].begin();
+      itr != positions[i].end(); ++itr)
+      printf("\t-%zd\n", static_cast<int>(*itr) -
+      (patterns[i].header_byte_array.size() - 1));
+  }
+}
+
+
+
+
+void PatternMatcher::create_goto()
 {
   positions.resize(patterns.size());
   int new_state = 0;
@@ -129,9 +134,6 @@ void PatternMatcher::create_goto(const vector<FileHeader>& patterns)
   for (uint8_t i = 0x00; i < 0xFF; i++)
     if (go_to[0].count((int)i) == 0)
       go_to[0][i] = 0;
-
-  create_failure();
-
 }
 
 
