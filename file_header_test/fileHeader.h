@@ -10,17 +10,19 @@ using namespace std;
 
 
 struct FileHeader {
+  
+  using byte_vec = vector<uint8_t>;
 
-    FileHeader();
-    FileHeader(string);
+  FileHeader();
+  FileHeader(string);
 
-    string          file_extension{};
-    vector<uint8_t> header_byte_array{};
-    vector<uint8_t> footer_byte_array{};
-    int             max_carve_size{};
+  string    file_extension{};
+  byte_vec  header_byte_array{};
+  byte_vec  footer_byte_array{};
+  int       max_carve_size{};
 
-    void import_header_byte_array(string);
-    void import_footer_byte_array(string);
-    uint8_t convert_hex(string&);
-    void print_header_info();
+  void import_header_array(string);
+  void import_footer_array(string);
+  uint8_t convert_hex(string&);
+  void print_header_info();
 };

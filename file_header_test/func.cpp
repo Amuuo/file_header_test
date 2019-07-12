@@ -1,3 +1,0 @@
-#include "func.h"
-
-

@@ -15,7 +15,7 @@ FileHeader::FileHeader(){}
 FileHeader::FileHeader(string s) : file_extension{ s } { }
 
 
-void FileHeader::import_header_byte_array(string tmp_vec){
+void FileHeader::import_header_array(string tmp_vec){
   
   istringstream iss{ tmp_vec };
   string pair;
@@ -24,7 +24,7 @@ void FileHeader::import_header_byte_array(string tmp_vec){
 }
 
 
-void FileHeader::import_footer_byte_array(string tmp_vec){
+void FileHeader::import_footer_array(string tmp_vec){
   
   istringstream iss{ tmp_vec };
   string pair;
