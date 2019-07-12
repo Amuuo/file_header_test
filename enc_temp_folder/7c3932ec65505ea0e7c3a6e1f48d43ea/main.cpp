@@ -66,9 +66,11 @@ void check_for_matches(smatch& regex_matches) {
 
 void test_input_for_matches(const char* input_file)
 {
+  ifstream    testFile{ input_file, ios::ate };
   char        current_byte;
-  ifstream    testFile{ input_file, ios::ate }; // open to EOF to get size
-  
+
+  // seek to EOF for filesize
+  //testFile.seekg(0, testFile.end);
   auto file_size = testFile.tellg();
   
   // allocate array of filesize  
@@ -93,7 +95,7 @@ void test_input_for_matches(const char* input_file)
     for (auto itr =  PM.positions[i].begin(); 
               itr != PM.positions[i].end(); 
               ++itr) {
-      printf("\t-%l\n", (int)* itr - (patterns[i].header_byte_array.size() - 1));
+      printf("\t-%d\n", (int)* itr - (patterns[i].header_byte_array.size() - 1));
     }
     cout << endl;
   }

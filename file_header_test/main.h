@@ -31,6 +31,7 @@
 #include <cmath>
 #include <cstdio>
 #include <memory>
+#include <array>
 #include "patternMatcher.h"
 #include <regex>
 #include "func.h"
@@ -41,10 +42,10 @@
 using namespace std;
 
 enum matches {
-  MATCH_EXTENSION = 1,
-  MATCH_HEADER,
-  MATCH_FOOTER,
-  MATCH_MAX_SIZE
+  EXTENSION = 1,
+  HEADER,
+  FOOTER,
+  MAX_SIZE
 };
 
 vector<FileHeader> patterns;
